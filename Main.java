@@ -1,13 +1,20 @@
 package com.cris.chat;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
+import java.net.*;
 
 public class Main extends JFrame{
     private JTextArea textArea;
     private JPanel mainPanel;
     private JButton sendButton;
     private JTextField messageBox;
+    private JButton uploadButton;
+    private JTextField portField;
+    public static int a;
+    public static boolean flag = Boolean.FALSE;
 
     public Main(String title) {
         super(title);
@@ -29,35 +36,44 @@ public class Main extends JFrame{
                 }
             }
         });
-    }
-    public static void main(String[] args) throws Exception {
-        /*
-        Map<String, List<String>> messageDB = new HashMap<>();
-        java.util.List<String> messages = new ArrayList<String>();
-        JList messageList = new JList();
-        messageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        messageList.addListSelectionListener(e -> {
-            System.out.println("SELECTED IS " + messageList.getSelectedValue());
-        });
-        messageList.setFont(new Font("Arial", Font.ITALIC, 30));
+        uploadButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try{
+                    Main.a = Integer.parseInt(portField.getText());
+                }
+                catch (Exception error){
+                    System.err.println("Cannot use Strings. Error code: " + error.getMessage());
+                    return;
+                }
 
-         */
-        JFrame window = new Main("Extraclase");
-        window.setSize(500,500);
-        window.setVisible(true);
-        /*ChatReceiver receiver = new ChatReceiver();
-        receiver.listen(s -> {
-            if (messageDB.containsKey(s.getSender())) {
-                messageDB.get(s.getSender()).add(s.getPayload());
-            } else {
-                java.util.List<String> messageForSender = new ArrayList<>();
-                messageForSender.add(s.getPayload());
-                messageDB.put(s.getSender(), messages);
+                JOptionPane.showMessageDialog(null, "Hosted port: " + Main.a);
+                flag = Boolean.TRUE;
+                String[] met = null;
+                try {
+                    main(met);
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
             }
-            messageList.setListData(messageDB.keySet().toArray());
+        });
+    }
+    public static void main(String[] args) throws IOException {
 
-         */
-    }//);
+
+
+        if (Main.flag == Boolean.TRUE){
+
+            System.out.println("Waiting for client...");
+            ServerSocket server = new ServerSocket(a);
+            Socket client = server.accept();
+            System.out.println("Client Connected");
+        } else{
+            JFrame window = new Main("Extraclase");
+            window.setSize(510,400);
+            window.setVisible(true);
+        }
+
+
+    }
 }
-//}
-
