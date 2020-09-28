@@ -7,7 +7,7 @@ import java.io.*;
 import java.net.*;
 
 public class Main extends JFrame{
-    private JTextArea textArea;
+    private JTextArea textArea1;
     private JPanel mainPanel;
     private JButton sendButton;
     private JTextField messageBox;
@@ -21,6 +21,8 @@ public class Main extends JFrame{
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setContentPane(mainPanel);
         this.pack();
+        sendButton.setEnabled(false);
+        textArea1.setEditable(false);
 
 
         sendButton.addActionListener(new ActionListener() {
@@ -31,8 +33,8 @@ public class Main extends JFrame{
                     return;
                 } else{
                     messageBox.setText("");
-                    textArea.append("Server: " + i);
-                    textArea.append("\n");
+                    textArea1.append("Server: " + i);
+                    textArea1.append("\n");
                 }
             }
         });
@@ -49,6 +51,7 @@ public class Main extends JFrame{
 
                 JOptionPane.showMessageDialog(null, "Hosted port: " + Main.a);
                 flag = Boolean.TRUE;
+                sendButton.setEnabled(true);
                 String[] met = null;
                 try {
                     main(met);
@@ -69,7 +72,7 @@ public class Main extends JFrame{
             Socket client = server.accept();
             System.out.println("Client Connected");
         } else{
-            JFrame window = new Main("Extraclase");
+            JFrame window = new Main("Main");
             window.setSize(510,400);
             window.setVisible(true);
         }
@@ -77,3 +80,5 @@ public class Main extends JFrame{
 
     }
 }
+
+
