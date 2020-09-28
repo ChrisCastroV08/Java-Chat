@@ -16,8 +16,11 @@ public class Client extends JFrame{
     private JButton sendButton;
     public static int b;
     public static boolean flag = Boolean.FALSE;
+    static Socket client;
+    static DataOutputStream dout;
+    static DataInputStream din;
 
-    public Client(String title) {
+    public Client(String title) throws IOException {
         super(title);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setContentPane(clientPanel);
@@ -28,27 +31,28 @@ public class Client extends JFrame{
 
         sendButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent evt) {
                 String i = messageBox.getText();
                 if (i.equals("")){
                     return;
                 } else{
-                    messageBox.setText("");
                     textArea2.append("Client: " + i);
                     textArea2.append("\n");
                     try {
-                        Messages();
-                    } catch (IOException ioException) {
-                        ioException.printStackTrace();
-                    }
+                        String msgout = "";
+                        msgout = messageBox.getText().trim();
+                        dout.writeUTF(msgout);
 
+                    } catch (Exception e) {
+
+                    }
 
                 }
             }
         });
         searchButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent evt) {
                 try{
                     Client.b = Integer.parseInt(portField2.getText());
                 }
@@ -70,22 +74,30 @@ public class Client extends JFrame{
         });
     }
 
-    protected static void Messages () throws IOException {
-        if (Client.flag == Boolean.TRUE){
-            System.out.println("Searching for Host...");
-            Socket client = new Socket("127.0.0.1", b);
-            System.out.println("Connected");
-            PrintStream pr = new PrintStream(client.getOutputStream());
-        } else {
-            return;
-        }
-
-
-    }
     public static void main(String[] args) throws IOException {
 
+        JTextArea textArea2 = new JTextArea();
+
         if (Client.flag == Boolean.TRUE){
-            Messages();
+            String msgin = "";
+            try{
+                System.out.println("Searching for Host...");
+                client = new Socket("127.0.0.1", b);
+                System.out.println("Connected");
+                din = new DataInputStream(client.getInputStream());
+                dout = new DataOutputStream(client.getOutputStream());
+
+
+
+                msgin = din.readUTF();
+                textArea2.setText(textArea2.getText().trim() + "\n Server: \t"+msgin);
+
+
+            } catch (Exception e){
+
+            }
+
+
 
         } else{
             JFrame window = new Client("Client");
