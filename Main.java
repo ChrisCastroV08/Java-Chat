@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.*;
 
-public class Main extends JFrame{
+public class Main extends JFrame {
     private JTextArea textArea1;
     private JPanel mainPanel;
     private JButton sendButton;
@@ -15,6 +15,10 @@ public class Main extends JFrame{
     private JTextField portField;
     public static int a;
     public static boolean flag = Boolean.FALSE;
+    static Socket client;
+    static ServerSocket server;
+    static DataOutputStream dout;
+    static DataInputStream din;
 
     public Main(String title) {
         super(title);
@@ -27,24 +31,31 @@ public class Main extends JFrame{
 
         sendButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent evt) {
                 String i = messageBox.getText();
-                if (i.equals("")){
+                if (i.equals("")) {
                     return;
-                } else{
-                    messageBox.setText("");
+                } else {
                     textArea1.append("Server: " + i);
                     textArea1.append("\n");
+
+                    try {
+                        String msgout = "";
+                        msgout = messageBox.getText().trim();
+                        dout.writeUTF(msgout);
+
+                    } catch (Exception e) {
+
+                    }
                 }
             }
         });
         uploadButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                try{
+            public void actionPerformed(ActionEvent evt) {
+                try {
                     Main.a = Integer.parseInt(portField.getText());
-                }
-                catch (Exception error){
+                } catch (Exception error) {
                     System.err.println("Cannot use Strings. Error code: " + error.getMessage());
                     return;
                 }
@@ -61,19 +72,47 @@ public class Main extends JFrame{
             }
         });
     }
+
+    public void Messages () throws IOException {
+        String msgin = "";
+
+        System.out.println("Waiting for client...");
+        server = new ServerSocket(a);
+        client = server.accept();
+        System.out.println("Client Connected");
+        din = new DataInputStream(client.getInputStream());
+        dout = new DataOutputStream(client.getOutputStream());
+        while (!msgin.equals("exit")) {
+            msgin = din.readUTF();
+            textArea1.setText(textArea1.getText() + "\n" + msgin);
+
+        }
+    }
+
     public static void main(String[] args) throws IOException {
+        JTextArea textArea1 = new JTextArea();
 
 
+        if (Main.flag == Boolean.TRUE) {
+            String msgin = "";
+            try{
+                System.out.println("Waiting for client...");
+                server = new ServerSocket(a);
+                client = server.accept();
+                System.out.println("Client Connected");
+                din = new DataInputStream(client.getInputStream());
+                dout = new DataOutputStream(client.getOutputStream());
+                msgin = din.readUTF();
+                textArea1.setText(textArea1.getText() + "\n" + msgin);
 
-        if (Main.flag == Boolean.TRUE){
 
-            System.out.println("Waiting for client...");
-            ServerSocket server = new ServerSocket(a);
-            Socket client = server.accept();
-            System.out.println("Client Connected");
-        } else{
+            } catch (Exception e){
+
+            }
+
+        } else {
             JFrame window = new Main("Main");
-            window.setSize(510,400);
+            window.setSize(510, 400);
             window.setVisible(true);
         }
 
